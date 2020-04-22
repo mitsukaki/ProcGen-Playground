@@ -4,3 +4,9 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
+
+var editor = ace.edit("editor");
+editor.setTheme("ace/theme/merbivore");
+editor.session.setMode("ace/mode/javascript");
+
+Split(['#preview', '#editor']);

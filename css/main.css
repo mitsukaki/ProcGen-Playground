@@ -16,3 +16,12 @@ body {
 #editor {
     font-size: 18px;
 }
+
+.panel {
+    display: block;
+    position: absolute;
+    padding: 0.5em;
+    background-color: #2e2e2e;
+    color: #ffffff;
+    border-radius: 0.5em;
+}

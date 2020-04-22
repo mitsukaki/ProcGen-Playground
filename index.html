@@ -2,6 +2,8 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" type="text/css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" type="text/css" rel="stylesheet">
     <link href="./css/main.css" type="text/css" rel="stylesheet">
     <title>ProcGen Playground</title>
   </head>
@@ -10,15 +12,20 @@
       <div class="split" id="preview"></div>
       <div class="split" id="editor">yeet</div>
     </div>
-    <script src="./js/renderer.js"></script>
-    <script src="./js/ace/ace.js"></script>
+    <div class="panel" style="top: 0; left: 0;">
+      <div class="row">
+        <div class="col-xs-6">
+          <div class="box">12</div>
+          <div class="box">12</div>
+        </div>
+        <div class="col-xs-6">
+          <div class="box">12</div>
+        </div>
+      </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.11/split.min.js"></script>
-    <script>
-      var editor = ace.edit("editor");
-      editor.setTheme("ace/theme/monokai");
-      editor.session.setMode("ace/mode/javascript");
-
-      Split(['#preview', '#editor']);
-    </script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>-->
+    <script src="./js/ace/ace.js"></script>
+    <script src="./js/renderer.js"></script>
   </body>
 </html>
