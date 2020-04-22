@@ -1,5 +1,5 @@
 body {
-    margin: 0px;
+    margin: 0;
     width: 100vw;
     height: 100vh;  
 }
@@ -21,7 +21,12 @@ body {
     display: block;
     position: absolute;
     padding: 0.5em;
-    background-color: #2e2e2e;
+    background-color: #161616;
     color: #ffffff;
     border-radius: 0.5em;
+}
+
+.corner-dock {
+    border-radius: 0em;
+    border-top-right-radius: 0.5em;
 }
