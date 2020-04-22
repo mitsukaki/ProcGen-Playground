@@ -1,0 +1,18 @@
+body {
+    margin: 0px;
+    width: 100vw;
+    height: 100vh;  
+}
+
+.split, .gutter.gutter-horizontal {
+    height: 100%;
+    float: left;
+}
+
+.gutter.gutter-horizontal {
+    cursor: ew-resize;
+}
+
+#editor {
+    font-size: 18px;
+}

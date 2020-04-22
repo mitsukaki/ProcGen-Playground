@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link href="./css/main.css" type="text/css" rel="stylesheet">
+    <title>ProcGen Playground</title>
+  </head>
+  <body>
+    <div style="display: block; width: 100%; height: 100%;">
+      <div class="split" id="preview"></div>
+      <div class="split" id="editor">yeet</div>
+    </div>
+    <script src="./js/renderer.js"></script>
+    <script src="./js/ace/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.11/split.min.js"></script>
+    <script>
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/javascript");
+
+      Split(['#preview', '#editor']);
+    </script>
+  </body>
+</html>
