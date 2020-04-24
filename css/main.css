@@ -1,7 +1,9 @@
 body {
     margin: 0;
     width: 100vw;
-    height: 100vh;  
+    height: 100vh;
+    /* the canvas overflows by 0.0000001th of a pixel -_- */
+    overflow: hidden;
 }
 
 .split, .gutter.gutter-horizontal {
@@ -29,4 +31,10 @@ body {
 .corner-dock {
     border-radius: 0em;
     border-top-right-radius: 0.5em;
+}
+
+.stats {
+    position: absolute;
+    top: 0;
+    left: 0;
 }

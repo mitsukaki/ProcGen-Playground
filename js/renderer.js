@@ -50,9 +50,15 @@ window.addEventListener('resize', () => {
 renderer.setSize($("#preview").width(), $("#preview").height());
 camera = new THREE.PerspectiveCamera(75, $("#preview").width() / $("#preview").height(), 0.1, 1000);
 
+// set up performance monitor
+var stats = new Stats();
+stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+stats.domElement.className = "stats";
+document.body.appendChild(stats.domElement);
+
 // launch render loop
 function animate() {
-    requestAnimationFrame(animate);
+    stats.begin();
 
     // update
     cube.rotation.x += 0.01;
@@ -60,6 +66,9 @@ function animate() {
 
     // render again
     renderer.render(scene, camera);
+
+    stats.end();
+    requestAnimationFrame(animate);
 }
 
 animate();
@@ -71,21 +80,47 @@ $("#btn-build").on("click", () => {
 
 function test(js_code) {
     try {
-       var matrix = generate_matrix(js_code);
+        const PtrSize = Module.ccall("GetPtrSize");
+        console.log("PTR: " + PtrSize);
 
+        const matrix  = generate_matrix(js_code, 10, 10, 10);
+        var clr_matrix = new Float32Array(4 * 10 * 10 * 10);
+        var list_addr = new Int32Array(3);
+        var list_size = new Int32Array(3);
+
+        var buf_matrix = Module._malloc(matrix.length * matrix.BYTES_PER_ELEMENT)
+        var buf_clr_matrix = Module._malloc(clr_matrix.length * clr_matrix.BYTES_PER_ELEMENT)
+        var buf_list_addr = Module._malloc(list_addr.length * list_addr.BYTES_PER_ELEMENT)
+        var buf_list_size = Module._malloc(list_size.length * list_size.BYTES_PER_ELEMENT)
+        
+        Module.HEAPF32.set(matrix, buf_matrix >> 2)
+        Module.HEAPF32.set(clr_matrix, buf_clr_matrix >> 2)
+        Module.HEAP32.set(list_addr, buf_list_addr >> 2)
+        Module.HEAP32.set(list_size, buf_list_size >> 2)
+
+        Module.ccall(
+            "GenerateMesh", null,
+            ["number", "number", "number", "number", "number", "number"],
+            [buf_matrix, buf_clr_matrix, buf_list_addr, buf_list_size, 10, 10]
+        );
+
+        console.log(list_addr);
+        console.log(list_size);
         console.log("Done.");
     } catch (e) {
         console.log(e);
+    } finally {
+        Module._free(buffer)
     }
 }
 
 function generate_matrix(js_code, wx, wy, wz) {
-    var matrix = new Array();
+    var matrix = new Float32Array(wx * wy * wz);
 
     for (var x = 0; x < wx; x++)
         for (var y = 0; y < wy; y++)
             for (var z = 0; z < wz; z++)
-                matrix[(x * wy * wz) + (y * wz) + z] = eval(compute_point(x, y, z, js_code));
+                matrix[(y * wx * wz) + (z * wx) + x] = eval(compute_point(x, y, z, js_code));
 
     return matrix;
 }

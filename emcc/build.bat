@@ -1,0 +1,1 @@
+emcc src/mesher.cc -o mesher.js -s EXPORTED_FUNCTIONS="['_GetPtrSize', '_GenerateMesh']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap']"
