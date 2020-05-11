@@ -369,7 +369,6 @@ void GenerateMesh(float data[], float color_data[], intptr_t addr[], int sizes[]
 {
     printf("width: %i\n", WIDTH);
     printf("height: %i\n", HEIGHT);
-    printf("addr: %p\n", addr);
 
     auto verts   = new std::vector<float>();
     auto normals = new std::vector<float>();
@@ -459,9 +458,6 @@ void GenerateMesh(float data[], float color_data[], intptr_t addr[], int sizes[]
     }
 
     // submit results
-    printf("verts: %f\n", verts->at(0));
-    printf("verts: %f\n", verts->at(1));
-    printf("verts: %f\n", verts->at(2));
     addr[0] = (intptr_t)verts->data();
     // addr[1] = (intptr_t)normals->data();
     // addr[2] = (intptr_t)colors->data();

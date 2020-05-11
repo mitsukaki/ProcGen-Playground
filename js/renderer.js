@@ -4,16 +4,16 @@
 // `nodeIntegration` is turned off. Use `preload.js` to
 // selectively enable features needed in the rendering
 // process.
-var world_x = 10;
-var world_y = 10;
-var world_z = 10;
+var world_x = 100;
+var world_y = 4;
+var world_z = 100;
 
 // set up the editor
 var editor = ace.edit("editor");
 editor.setTheme("ace/theme/merbivore");
 editor.session.setMode("ace/mode/javascript");
 editor.session.setValue(
-    "function compute(x, y, z) {\n    return x + y + z;\n}\n"
+    "function compute(x, y, z) {\n    return 1.0 - (y / G.HEIGHT);\n}\n"
 );
 
 // set up 3d renderer
@@ -23,7 +23,7 @@ var renderer = new THREE.WebGLRenderer();
 $("#preview").append(renderer.domElement);
 
 var geometry = new THREE.BoxGeometry();
-var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+var material = new THREE.MeshDepthMaterial({ wireframe: true});
 var cube = new THREE.Mesh(geometry, material);
 cube.position.z = -5;
 scene.add(cube);
@@ -83,8 +83,8 @@ function test(js_code) {
         const PtrSize = Module.ccall("GetPtrSize");
         console.log("PTR: " + PtrSize);
 
-        var matrix = generate_matrix(js_code, 10, 10, 10);
-        var clr_matrix = new Float32Array(4 * 10 * 10 * 10);
+        var matrix = generate_matrix(js_code, world_x, world_y, world_z);
+        var clr_matrix = new Float32Array(4 * world_x * world_y * world_z);
         var list_addr = new Int32Array(3);
         var list_size = new Int32Array(3);
 
@@ -101,7 +101,7 @@ function test(js_code) {
         Module.ccall(
             "GenerateMesh", null,
             ["number", "number", "number", "number", "number", "number"],
-            [buf_matrix, buf_clr_matrix, buf_list_addr, buf_list_size, 10, 10]
+            [buf_matrix, buf_clr_matrix, buf_list_addr, buf_list_size, world_x, world_y]
         );
 
         var vert_addr = Module.HEAP32[buf_list_addr / Int32Array.BYTES_PER_ELEMENT] / Float32Array.BYTES_PER_ELEMENT;
@@ -112,16 +112,23 @@ function test(js_code) {
         var norm_count = Module.HEAP32[buf_list_size / Int32Array.BYTES_PER_ELEMENT + 1];
         var clrs_count = Module.HEAP32[buf_list_size / Int32Array.BYTES_PER_ELEMENT + 2];
         
-        var vertices = Module.HEAPF32.slice(vert_addr, vert_addr + vert_count);
+        var verts = Module.HEAPF32.slice(vert_addr, vert_addr + vert_count);
         // var normals = Module.HEAPF32.slice(norm_addr, norm_addr + norm_count);
         // var colors = Module.HEAPF32.slice(clrs_addr, clrs_addr + clrs_count);
 
-        /*
+        var geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+        var material = new THREE.MeshDepthMaterial();
+        mesh = new THREE.Mesh(geometry, material);
+        mesh.position.x = -2;
+        mesh.position.z = -5;
+        mesh.position.y = -3;
+        scene.add(mesh);
+
         Module._free(buf_matrix);
         Module._free(buf_clr_matrix);
         Module._free(buf_list_addr);
         Module._free(buf_list_size);
-        */
 
         console.log("Done.");
     } catch (e) {
@@ -134,14 +141,27 @@ function test(js_code) {
 function generate_matrix(js_code, wx, wy, wz) {
     var matrix = new Float32Array(wx * wy * wz);
 
+    var context = make_obj_injection("G", {
+        WIDTH: world_x,
+        HEIGHT: world_y
+    });
+
     for (var x = 0; x < wx; x++)
         for (var y = 0; y < wy; y++)
             for (var z = 0; z < wz; z++)
-                matrix[(y * wx * wz) + (z * wx) + x] = eval(compute_point(x, y, z, js_code));
+                matrix[(y * wx * wz) + (z * wx) + x] = eval(compute_point(x, y, z, js_code, context));
 
     return matrix;
 }
 
-function compute_point(x, y, z, js_code) {
-    return eval("compute(" + x + ", " + y + ", " + z + ");" + js_code);
+function compute_point(x, y, z, js_code, globals) {
+    return eval(globals + "compute(" + x + ", " + y + ", " + z + ");" + js_code);
+}
+
+function make_obj_injection(name, context) {
+    return make_var_injection(name, JSON.stringify(context));
+}
+
+function make_var_injection(name, context) {
+    return "const " + name + " = " + context + "; ";
 }

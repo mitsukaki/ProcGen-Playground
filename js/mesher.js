@@ -1336,11 +1336,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5263552,
+    STACK_BASE = 5263536,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 20672,
-    DYNAMIC_BASE = 5263552,
-    DYNAMICTOP_PTR = 20512;
+    STACK_MAX = 20656,
+    DYNAMIC_BASE = 5263536,
+    DYNAMICTOP_PTR = 20496;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1939,7 +1939,7 @@ var ASM_CONSTS = {
 
 
 
-// STATICTOP = STATIC_BASE + 19648;
+// STATICTOP = STATIC_BASE + 19632;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -2021,12 +2021,8 @@ var ASM_CONSTS = {
       abort('stack overflow')
     }
 
-  function _abort() {
-      abort();
-    }
-
   function _emscripten_get_sbrk_ptr() {
-      return 20512;
+      return 20496;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
@@ -2192,7 +2188,7 @@ function intArrayToString(array) {
 
 
 var asmGlobalArg = {};
-var asmLibraryArg = { "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "abort": _abort, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "fd_write": _fd_write, "memory": wasmMemory, "setTempRet0": _setTempRet0, "table": wasmTable };
+var asmLibraryArg = { "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "fd_write": _fd_write, "memory": wasmMemory, "setTempRet0": _setTempRet0, "table": wasmTable };
 var asm = createWasm();
 Module["asm"] = asm;
 /** @type {function(...*):?} */
