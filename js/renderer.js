@@ -83,7 +83,7 @@ function test(js_code) {
         const PtrSize = Module.ccall("GetPtrSize");
         console.log("PTR: " + PtrSize);
 
-        const matrix  = generate_matrix(js_code, 10, 10, 10);
+        var matrix = generate_matrix(js_code, 10, 10, 10);
         var clr_matrix = new Float32Array(4 * 10 * 10 * 10);
         var list_addr = new Int32Array(3);
         var list_size = new Int32Array(3);
@@ -104,8 +104,25 @@ function test(js_code) {
             [buf_matrix, buf_clr_matrix, buf_list_addr, buf_list_size, 10, 10]
         );
 
-        console.log(list_addr);
-        console.log(list_size);
+        var vert_addr = Module.HEAP32[buf_list_addr / Int32Array.BYTES_PER_ELEMENT] / Float32Array.BYTES_PER_ELEMENT;
+        var norm_addr = Module.HEAP32[buf_list_addr / Int32Array.BYTES_PER_ELEMENT + 1] / Float32Array.BYTES_PER_ELEMENT;
+        var clrs_addr = Module.HEAP32[buf_list_addr / Int32Array.BYTES_PER_ELEMENT + 2] / Float32Array.BYTES_PER_ELEMENT;
+        
+        var vert_count = Module.HEAP32[buf_list_size / Int32Array.BYTES_PER_ELEMENT];
+        var norm_count = Module.HEAP32[buf_list_size / Int32Array.BYTES_PER_ELEMENT + 1];
+        var clrs_count = Module.HEAP32[buf_list_size / Int32Array.BYTES_PER_ELEMENT + 2];
+        
+        var vertices = Module.HEAPF32.slice(vert_addr, vert_addr + vert_count);
+        // var normals = Module.HEAPF32.slice(norm_addr, norm_addr + norm_count);
+        // var colors = Module.HEAPF32.slice(clrs_addr, clrs_addr + clrs_count);
+
+        /*
+        Module._free(buf_matrix);
+        Module._free(buf_clr_matrix);
+        Module._free(buf_list_addr);
+        Module._free(buf_list_size);
+        */
+
         console.log("Done.");
     } catch (e) {
         console.log(e);

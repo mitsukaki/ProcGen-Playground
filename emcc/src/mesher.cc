@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <vector>
 #include <emscripten/emscripten.h>
+#include <stdio.h>
 
 struct float3
 {
@@ -349,20 +350,27 @@ void AddVert(std::vector<float>* verts, std::vector<float>* colors, float3 vert,
 }
 
 extern "C" {
-    
+    int GetPtrSize();
+
+    void GenerateMesh(float data[], float color_data[], intptr_t addr[], int sizes[], int WIDTH, int HEIGHT);
+}
+
 int GetPtrSize()
 {
     return sizeof(intptr_t);
 }
-
 
 /*
     Implementation of the marching cubes algorithm with interpolation on the
     vertices to generate "smooth" voxels.
 */
 
-void GenerateMesh(float* data, float* color_data, intptr_t* addr, int* sizes, int WIDTH, int HEIGHT)
+void GenerateMesh(float data[], float color_data[], intptr_t addr[], int sizes[], int WIDTH, int HEIGHT)
 {
+    printf("width: %i\n", WIDTH);
+    printf("height: %i\n", HEIGHT);
+    printf("addr: %p\n", addr);
+
     auto verts   = new std::vector<float>();
     auto normals = new std::vector<float>();
     auto colors  = new std::vector<float>();
@@ -419,14 +427,14 @@ void GenerateMesh(float* data, float* color_data, intptr_t* addr, int* sizes, in
         float yp = y + 1.0f;
         float zp = z + 1.0f;
 
-        float3 v0  = float3(x,  y,  z);
-        float3 v1  = float3(x,  y,  zp);
-        float3 v2  = float3(xp, y,  zp);
-        float3 v3  = float3(xp, y,  z);
-        float3 v4  = float3(x,  yp, z);
-        float3 v5  = float3(x,  yp, zp);
-        float3 v6  = float3(xp, yp, zp);
-        float3 v7  = float3(xp, yp, z);
+        float3 v0 = float3(x,  y,  z);
+        float3 v1 = float3(x,  y,  zp);
+        float3 v2 = float3(xp, y,  zp);
+        float3 v3 = float3(xp, y,  z);
+        float3 v4 = float3(x,  yp, z);
+        float3 v5 = float3(x,  yp, zp);
+        float3 v6 = float3(xp, yp, zp);
+        float3 v7 = float3(xp, yp, z);
 
         for (int i = 0; edges[i] != -1; i++)
         {
@@ -451,6 +459,9 @@ void GenerateMesh(float* data, float* color_data, intptr_t* addr, int* sizes, in
     }
 
     // submit results
+    printf("verts: %f\n", verts->at(0));
+    printf("verts: %f\n", verts->at(1));
+    printf("verts: %f\n", verts->at(2));
     addr[0] = (intptr_t)verts->data();
     // addr[1] = (intptr_t)normals->data();
     // addr[2] = (intptr_t)colors->data();
@@ -460,6 +471,4 @@ void GenerateMesh(float* data, float* color_data, intptr_t* addr, int* sizes, in
     
     // TODO: implement normal calculation that can be burst compiled
     // mf.mesh.RecalculateNormals();
-}
-
 }
