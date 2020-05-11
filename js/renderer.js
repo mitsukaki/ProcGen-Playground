@@ -167,7 +167,11 @@ function test(js_code) {
 
         var geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.BufferAttribute(verts, 3));
-        var material = new THREE.MeshDepthMaterial({ wireframe: true });
+
+        var material = new THREE.MeshDepthMaterial({
+            wireframe: true,
+            side: THREE.DoubleSide
+        });
         mesh = new THREE.Mesh(geometry, material);
         
         // center mesh
