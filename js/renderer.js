@@ -8,6 +8,10 @@ var world_x = 100;
 var world_y = 4;
 var world_z = 100;
 
+var cam_move_x = 0;
+var cam_move_y = 0;
+var cam_move_z = 0;
+
 // set up the editor
 var editor = ace.edit("editor");
 editor.setTheme("ace/theme/merbivore");
@@ -23,16 +27,20 @@ var renderer = new THREE.WebGLRenderer();
 $("#preview").append(renderer.domElement);
 
 var geometry = new THREE.BoxGeometry();
-var material = new THREE.MeshDepthMaterial({ wireframe: true});
+var material = new THREE.MeshDepthMaterial({ wireframe: true });
 var cube = new THREE.Mesh(geometry, material);
-cube.position.z = -5;
+cube.position.z = -4;
 scene.add(cube);
 
 // set up the content divide, and resize handle
 Split(['#preview', '#editor'], {
     onDrag: () => {
         renderer.setSize($("#preview").width(), $("#preview").height());
+        var pos = camera != undefined ? camera.position : { x: 0, y: 0, z: 0 };
         camera = new THREE.PerspectiveCamera(75, $("#preview").width() / $("#preview").height(), 0.1, 1000);
+        camera.position.x = pos.x;
+        camera.position.y = pos.y;
+        camera.position.z = pos.z;
     },
     onDragEnd: (sizes) => {
         // TODO: save size to reload on next startup
@@ -43,7 +51,11 @@ Split(['#preview', '#editor'], {
 // set window resize handle
 window.addEventListener('resize', () => {
     renderer.setSize($("#preview").width(), $("#preview").height());
+    var pos = camera != undefined ? camera.position : { x: 0, y: 0, z: 0 };
     camera = new THREE.PerspectiveCamera(75, $("#preview").width() / $("#preview").height(), 0.1, 1000);
+    camera.position.x = pos.x;
+    camera.position.y = pos.y;
+    camera.position.z = pos.z;
 });
 
 // set intial renderer size
@@ -64,6 +76,11 @@ function animate() {
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
 
+    // move camera
+    camera.position.x += 0.1 * cam_move_x;
+    camera.position.y += 0.1 * cam_move_y;
+    camera.position.z += 0.1 * cam_move_z;
+
     // render again
     renderer.render(scene, camera);
 
@@ -72,6 +89,38 @@ function animate() {
 }
 
 animate();
+
+document.addEventListener('keydown', (event) => {
+    switch (event.keyCode) {
+        case 65: //a
+            cam_move_x = -1.0;
+            break;
+        case 68: //d
+            cam_move_x = 1.0;
+            break;
+        case 87: //w
+            cam_move_z = -1.0;
+            break;
+        case 83: //s
+            cam_move_z = 1.0;
+            break;
+        case 81: //q
+            cam_move_y = -1.0;
+            break;
+        case 69: //e
+            cam_move_y = 1.0;
+            break;
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    if (event.keyCode == 65 || event.keyCode == 68)
+        cam_move_x = 0.0;
+    if (event.keyCode == 87 || event.keyCode == 83)
+        cam_move_z = 0.0;
+    if (event.keyCode == 81 || event.keyCode == 69)
+        cam_move_y = 0.0;
+});
 
 // create button for build
 $("#btn-build").on("click", () => {
@@ -118,11 +167,14 @@ function test(js_code) {
 
         var geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.BufferAttribute(verts, 3));
-        var material = new THREE.MeshDepthMaterial();
+        var material = new THREE.MeshDepthMaterial({ wireframe: true });
         mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = -2;
-        mesh.position.z = -5;
-        mesh.position.y = -3;
+        
+        // center mesh
+        mesh.position.x = -(world_x / 2);
+        mesh.position.y = -(world_y / 2);
+        mesh.position.z = -(world_z / 2);
+
         scene.add(mesh);
 
         Module._free(buf_matrix);
