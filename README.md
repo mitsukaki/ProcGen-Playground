@@ -1,2 +1,2 @@
 # ProcGen-Playground
-Playground for testing procedural generation algorithms
+Playground for testing procedural generation algorithms. Largely a WIP.
